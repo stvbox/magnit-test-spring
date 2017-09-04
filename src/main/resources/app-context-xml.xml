@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+	
+	<!-- <bean id="computerObject" class="ru.gootsite.magnit.ComputerAvSum" /> -->
+	
+	<bean id="mainObject" class="ru.gootsite.magnit.Starter" >
+		<property name="computer">
+			<!-- Вычислитель для суммы элементов -->
+			<bean class="ru.gootsite.magnit.ComputerSum" />
+			<!-- Вычислитель для средней арифметической суммы элементов -->
+			<!--<bean class="ru.gootsite.magnit.ComputerAvSum" />-->
+		</property>
+		<property name="dbService">
+            <bean class="ru.gootsite.magnit.DBService" >
+            	<property name="connectionString" value="jdbc:sqlite:TEST.db" />
+            </bean>
+        </property>
+        <property name="fileService">
+        	<bean class="ru.gootsite.magnit.FilesService" />
+        </property>
+        
+	</bean>
+	
+	<bean id="measure" class="ru.gootsite.magnit.Measure" />
+	
+	<aop:config>
+        <aop:aspect id="mes1" ref="measure">
+            <aop:pointcut id="serviceMeasure1" expression="execution(* ru.gootsite.magnit.DBService.*(..)  )"/>
+            <aop:around method="measureTime"   pointcut-ref="serviceMeasure1" />
+        </aop:aspect>
+		<aop:aspect id="mes2" ref="measure">
+            <aop:pointcut id="serviceMeasure2" expression="execution(* ru.gootsite.magnit.FilesService.*(..)  )"/>
+            <aop:around method="measureTime"   pointcut-ref="serviceMeasure2" />
+        </aop:aspect>
+		<aop:aspect id="mes3" ref="measure">
+            <aop:pointcut id="serviceMeasure3" expression="execution(* ru.gootsite.magnit.ComputerSum.*(..)  )"/>
+            <aop:around method="measureTime"   pointcut-ref="serviceMeasure3" />
+        </aop:aspect>
+		<aop:aspect id="mes4" ref="measure">
+            <aop:pointcut id="serviceMeasure4" expression="execution(* ru.gootsite.magnit.ComputerAvSum.*(..)  )"/>
+            <aop:around method="measureTime"   pointcut-ref="serviceMeasure4" />
+        </aop:aspect>
+
+    </aop:config>
+
+</beans>
